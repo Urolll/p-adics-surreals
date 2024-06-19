@@ -52,7 +52,7 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
       // returns a multiple of stars from doing n1 + n2  
       // adding stars is equivalent to xor
 
-### example of surreal code usage
+### Example of surreal.rs Usage
 ```rust
 fn main() {
       let zero = construct("{ | }"); // creates a surreal number with value 0
