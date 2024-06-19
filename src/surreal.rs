@@ -68,6 +68,10 @@ fn test() {
     let x = construct("{ 1, 2 | }");
     let y = construct("{ 2, 3, 4 | 9, 2 }");
     let zero = construct("{ | }");
+    let alt_zero = Surreal {
+        l: vec![].into(),
+        r: vec![].into(),
+    };
 
     let neg_x = negate(&x);
     print(&x);
@@ -77,7 +81,7 @@ fn test() {
     print(&y);
     print(&neg_y);
 
-    print(&zero);
+    print(&alt_zero);
     print(&negate(&zero));
 }
 
