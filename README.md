@@ -1,7 +1,7 @@
 # p-adics-surreals
 Computations of p-adic Numbers and Surreal Numbers in Parallel
 
-// surreal.rs
+## surreal.rs
 - [x] fn construct(num: &str) -> Surreal
       // takes a string of the form { L | R } and parse it to create a struct of surreal
 
