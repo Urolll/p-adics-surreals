@@ -55,29 +55,27 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
 ### Example of surreal.rs Usage
 ```rust
 fn main() {
-      let zero = construct("{ | }"); // creates a surreal number with value 0
-      let num1 = construct("{ 1 | }"); // creates a surreal with L = 1, R = NULL
+      let zero = construct("{ | }"); // creates a surreal number with L = NONE, R = NONE (value = 0)
+      let num1 = construct("{ 1 | }"); // creates a surreal with L = 1, R = NONE (value = 2)
       let num2 = construct("{ 1, 2 | 0 }"); // creates a surreal with L = 1 and 2, and R = 0
       let neg_num1 = negate(&num1); // negates num1 resulting in { | -1 }
       let num1_plus_zero = add(&num1, &zero); // adds num1 and zero resulting in { 1 | }
       print(&neg_num1); // prints { | -1 }
 
       let alt_zero = Surreal {
-            l: vec![]
-             // creates a surreal number with value 0,
-            r: vec![], // creates
-      }; // alternative way to de a surreal with L = 1, R = NULLfine a surreal number
-      let also_alt_zero = zero(); // alternative way to define z // creates a surreal with L = 1 and 2, and R = 0ero
-      let s: Surreal = star(1); // creates a surreal with { 0 | 0 } // negates numresulting inresulting in { 1 | ng { | -1 }
-      let s2 = astar(2, 3); // creates a surreal with value of *2 + *3 = *1 // adds num1 and zero  // prints { | -1 }
-      let alt_zero = Surreal {
             l: vec![].into(),
             r: vec![].into(),
-      }; // alternative way to define a surreal number
-      let also_alt_zero = zero(); // alternative way to define zero
-      let s: Surreal = star(1); // creates a surreal with { 0 | 0 }
+      }; 
+      
+      let alt_num2 = Surreal {
+            l: vec![1, 2].into(),
+            r: vec![0].into(),
+      };
+      // alternative way to define surreal
+      
+      let also_alt_zero = zero(); // alternative function to define zero
+      let s: Surreal = star(1); // creates a surreal with { 0 | 0 } 
       let s2 = astar(2, 3); // creates a surreal with value of *2 + *3 = *1
-                              // its value is this { 0 | 0 }
-                              // its value is this { 0 | 0 }
+                             // its value is { 0 | 0 }
 }
 ```
