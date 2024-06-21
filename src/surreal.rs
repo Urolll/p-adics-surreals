@@ -2,6 +2,7 @@
 pub struct Surreal {
     l: Option<Vec<i32>>,
     r: Option<Vec<i32>>,
+    // change this to be a recursive struct later
 }
 
 pub fn construct(num: &str) -> Surreal {
@@ -72,6 +73,10 @@ fn test() {
         l: vec![].into(),
         r: vec![].into(),
     };
+    let k: Surreal = Surreal {
+        l: vec![1, 2, 3].into(),
+        r: vec![].into(),
+    };
 
     let neg_x = negate(&x);
     print(&x);
@@ -83,6 +88,8 @@ fn test() {
 
     print(&alt_zero);
     print(&negate(&zero));
+
+    print(&negate(&k));
 }
 
 fn main() {
