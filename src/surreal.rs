@@ -1,97 +1,124 @@
+use std::str::Chars;
+
 #[derive(Debug)]
 pub struct Surreal {
-    l: Option<Vec<i32>>,
-    r: Option<Vec<i32>>,
+    pub l: Option<Vec<SurrealValue>>,
+    pub r: Option<Vec<SurrealValue>>,
     // change this to be a recursive struct later
 }
 
+#[derive(Debug)]
+pub enum SurrealValue {
+    Integer(i32),
+    Surreal(Surreal),
+}
+
 pub fn construct(num: &str) -> Surreal {
-    let trimmed = num
-        .trim_matches(|c| c == '{' || c == '}' || c == ' ')
-        .trim();
-    let parts: Vec<&str> = trimmed.split('|').collect();
-    let result = |part: &str| -> Vec<i32> {
-        part.split(',')
-            .filter_map(|s| s.trim().parse::<i32>().ok())
-            .collect::<Vec<i32>>()
-    };
-    let lhs = if parts.len() > 0 && !parts[0].trim().is_empty() {
-        Some(result(parts[0]))
-    } else {
-        None
-    };
-    let rhs = if parts.len() > 1 && !parts[1].trim().is_empty() {
-        Some(result(parts[1]))
-    } else {
-        None
-    };
-    construct_from_vec(lhs, rhs)
+    fn parse_value(chars: &mut Chars) -> SurrealValue {
+        let mut buffer = String::new();
+        while let Some(c) = chars.as_str().chars().next() {
+            match c {
+                '{' => {
+                    return SurrealValue::Surreal(parse_surreal(chars));
+                }
+                '}' | '|' | ',' => break,
+                _ => buffer.push(c),
+            }
+            chars.next();
+        }
+        buffer
+            .trim()
+            .parse::<i32>()
+            .map(SurrealValue::Integer)
+            .expect("Invalid integer value")
+    }
+
+    fn parse_surreal(chars: &mut Chars) -> Surreal {
+        chars.next(); // Skip '{'
+        let mut l = Vec::new();
+        let mut r = Vec::new();
+        let mut left = true;
+
+        while let Some(c) = chars.as_str().chars().next() {
+            match c {
+                '}' => {
+                    chars.next();
+                    break;
+                }
+                '|' => {
+                    left = false;
+                    chars.next();
+                }
+                ',' => {
+                    chars.next();
+                }
+                ' ' => {
+                    chars.next();
+                }
+                _ => {
+                    if left {
+                        l.push(parse_value(chars));
+                    } else {
+                        r.push(parse_value(chars));
+                    }
+                }
+            }
+        }
+        Surreal {
+            l: if l.is_empty() { None } else { Some(l) },
+            r: if r.is_empty() { None } else { Some(r) },
+        }
+    }
+
+    let mut chars = num.chars();
+    parse_surreal(&mut chars)
 }
 
-fn construct_from_vec(left: Option<Vec<i32>>, right: Option<Vec<i32>>) -> Surreal {
-    Surreal { l: left, r: right }
-}
-
-fn vec_to_string(v: Vec<i32>) -> String {
-    v.iter()
-        .map(|num| num.to_string())
-        .collect::<Vec<String>>()
-        .join(", ")
+fn value_to_string(v: &SurrealValue) -> String {
+    match v {
+        SurrealValue::Integer(i) => i.to_string(),
+        SurrealValue::Surreal(s) => format!("{}", s),
+    }
 }
 
 pub fn negate(n: &Surreal) -> Surreal {
     let Surreal { l, r } = n;
-    let nlhs = match l {
-        Some(l) => Some(l.iter().map(|&num| -num).collect::<Vec<i32>>()),
-        None => None,
+    let negated = |val: &SurrealValue| -> SurrealValue {
+        match val {
+            SurrealValue::Integer(i) => SurrealValue::Integer(-i),
+            SurrealValue::Surreal(s) => SurrealValue::Surreal(negate(s)),
+        }
     };
-    let nrhs = match r {
-        Some(r) => Some(r.iter().map(|&num| -num).collect::<Vec<i32>>()),
-        None => None,
-    };
+    let nlhs = l.as_ref().map(|v| v.iter().map(negated).collect());
+    let nrhs = r.as_ref().map(|v| v.iter().map(negated).collect());
     Surreal { l: nrhs, r: nlhs }
 }
 
+impl std::fmt::Display for Surreal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let Surreal { l, r } = self;
+        let left: String = l
+            .as_ref()
+            .map(|v| {
+                v.iter()
+                    .map(value_to_string)
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            })
+            .unwrap_or_else(String::new);
+        let right: String = r
+            .as_ref()
+            .map(|v| {
+                v.iter()
+                    .map(value_to_string)
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            })
+            .unwrap_or_else(String::new);
+        write!(f, "{{ {} | {} }}", left, right)
+    }
+}
+
 pub fn print(n: &Surreal) {
-    let Surreal { l, r } = n;
-    let left: String = match l {
-        Some(l) => vec_to_string(l.to_vec()),
-        None => String::new(),
-    };
-    let right: String = match r {
-        Some(r) => vec_to_string(r.to_vec()),
-        None => String::new(),
-    };
-    println!("{{{} | {}}}", left, right);
-}
-
-fn test() {
-    let x = construct("{ 1, 2 | }");
-    let y = construct("{ 2, 3, 4 | 9, 2 }");
-    let zero = construct("{ | }");
-    let alt_zero = Surreal {
-        l: vec![].into(),
-        r: vec![].into(),
-    };
-    let k: Surreal = Surreal {
-        l: vec![1, 2, 3].into(),
-        r: vec![].into(),
-    };
-
-    let neg_x = negate(&x);
-    print(&x);
-    print(&neg_x);
-
-    let neg_y = negate(&y);
-    print(&y);
-    print(&neg_y);
-
-    print(&alt_zero);
-    print(&negate(&zero));
-
-    print(&negate(&k));
-}
-
-fn main() {
-    test();
+    println!("{}", n);
 }

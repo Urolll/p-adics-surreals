@@ -2,6 +2,8 @@
 Computations of p-adic Numbers and Surreal Numbers in Parallel
 
 ## surreal.rs
+- [x] pub struct Surreal { pub l: Option<Vec<i32>>, pub r: Option<Vec<i32>>, }  
+
 - [x] fn construct(num: &str) -> Surreal  
       // takes a string of the form { L | R } and parse it to create a struct of surreal
 
@@ -81,3 +83,9 @@ fn main() {
 ```
 
 ## p-adic.rs
+- [] pub struct Padic { }
+
+### Example of p-adic.rs Usage
+```rust
+fn 
+```
