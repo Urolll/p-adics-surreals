@@ -34,4 +34,13 @@ fn main() {
     let nested = construct("{ 1 | { 0 | { -1 | } } }");
     print(&nested);
     print(&negate(&nested));
+
+    let star_1 = star(1);
+    print(&star_1);
+    let star_2 = star(2);
+    print(&star_2);
+    let star_3 = star(3);
+    print(&star_3);
+    let star = astar(2, 3);
+    print(&negate(&star));
 }

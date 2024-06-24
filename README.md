@@ -46,11 +46,11 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
 - [ ] fn zero() -> Surreal  
       // returns zero, which is { | }
 
-- [ ] fn star(n: i32) -> Surreal  
+- [x] fn star(n: i32) -> Surreal  
       // returns a multiple of n stars  
       // star is defined as { 0 | 0 }
 
-- [ ] fn astar(n1: i32, n2: i32) -> Surreal  
+- [x] fn astar(n1: i32, n2: i32) -> Surreal  
       // returns a multiple of stars from doing n1 + n2  
       // adding stars is equivalent to xor
 
@@ -83,9 +83,11 @@ fn main() {
 ```
 
 ## p-adic.rs
-- [] pub struct Padic { }
+- [ ] pub struct Padic { }
 
 ### Example of p-adic.rs Usage
 ```rust
-fn 
+fn main() {
+      
+}
 ```

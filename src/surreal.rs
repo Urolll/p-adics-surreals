@@ -1,13 +1,13 @@
 use std::str::Chars;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Surreal {
     pub l: Option<Vec<SurrealValue>>,
     pub r: Option<Vec<SurrealValue>>,
     // change this to be a recursive struct later
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SurrealValue {
     Integer(i32),
     Surreal(Surreal),
@@ -121,4 +121,47 @@ impl std::fmt::Display for Surreal {
 
 pub fn print(n: &Surreal) {
     println!("{}", n);
+}
+
+fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
+    if to_left {
+        if let Some(l) = &mut surreal.l {
+            l.push(value);
+        } else {
+            surreal.l = Some(vec![value]);
+        }
+    } else {
+        if let Some(r) = &mut surreal.r {
+            r.push(value);
+        } else {
+            surreal.r = Some(vec![value]);
+        }
+    }
+}
+
+pub fn star(n: i32) -> Surreal {
+    fn star_tail(n: i32, acc: Surreal) -> Surreal {
+        match n {
+            1 => acc,
+            _ => star_tail(n - 1, {
+                let mut new_acc = acc.clone();
+                append(&mut new_acc, SurrealValue::Surreal(acc.clone()), true);
+                append(&mut new_acc, SurrealValue::Surreal(acc.clone()), false);
+                new_acc
+            }),
+        }
+    }
+    let star = Surreal {
+        l: Some(vec![SurrealValue::Integer(0)]),
+        r: Some(vec![SurrealValue::Integer(0)]),
+    };
+    if n == 1 {
+        star
+    } else {
+        star_tail(n, star)
+    }
+}
+
+pub fn astar(n1: i32, n2: i32) -> Surreal {
+    star(n1 ^ n2)
 }
