@@ -96,3 +96,41 @@ pub fn print_pstar(star: &PStar) {
         .join(", ");
     println!("{{ {} | {} }}", l_string, r_string);
 }
+
+fn star_to_surreal(value: &StarValue) -> SurrealValue {
+    match value {
+        StarValue::String(s) => {
+            if s == "*" {
+                SurrealValue::Surreal(star(1))
+            } else {
+                let n = s.trim_start_matches('*').parse::<i32>().unwrap();
+                SurrealValue::Surreal(star(n))
+            }
+        }
+        StarValue::Integer(i) => SurrealValue::Integer(*i),
+    }
+}
+
+fn map_to_surreal(values: &[StarValue]) -> Vec<SurrealValue> {
+    values.par_iter().map(star_to_surreal).collect()
+}
+
+pub fn expand_pstar(star: PStar) -> Surreal {
+    let (l, r): (Option<Vec<SurrealValue>>, Option<Vec<SurrealValue>>) = rayon::join(
+        || {
+            if star.l.is_empty() {
+                None
+            } else {
+                Some(map_to_surreal(&star.l))
+            }
+        },
+        || {
+            if star.r.is_empty() {
+                None
+            } else {
+                Some(map_to_surreal(&star.r))
+            }
+        },
+    );
+    Surreal { l, r }
+}

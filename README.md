@@ -6,6 +6,10 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
 
 - [x] pub enum SurrealValue { Integer(i32), Surreal(Surreal), }  
 
+- [x] pub struct PStar { pub l: Vec<StarValue>, pub r: Vec<StarValue>, }  
+
+- [x] pub enum StarValue { String(String), Integer(i32), }  
+
 - [x] fn construct(num: &str) -> Surreal  
       // takes a string of the form { L | R } and parse it to create a struct of surreal
 
@@ -62,10 +66,10 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
 - [x] fn pretty_astar(n1: i32, n2: i32) -> PStar  
       // returns a multiples of stars from doing n1 + n2 readily pretty printed
 
-- [ ] fn print_pstar(star: PStar)
+- [x] fn print_pstar(star: PStar)
       // takes a pretty printed star and prints to the console
 
-- [ ] fn expand_pstar(star: PStar) -> Surreal
+- [x] fn expand_pstar(star: PStar) -> Surreal
       // converts a pretty printed star to its surreal counterpart
       
 
