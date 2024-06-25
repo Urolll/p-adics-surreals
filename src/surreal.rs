@@ -1,10 +1,10 @@
+use rayon::prelude::*;
 use std::str::Chars;
 
 #[derive(Debug, Clone)]
 pub struct Surreal {
     pub l: Option<Vec<SurrealValue>>,
     pub r: Option<Vec<SurrealValue>>,
-    // change this to be a recursive struct later
 }
 
 #[derive(Debug, Clone)]
@@ -34,7 +34,7 @@ pub fn construct(num: &str) -> Surreal {
     }
 
     fn parse_surreal(chars: &mut Chars) -> Surreal {
-        chars.next(); // Skip '{'
+        chars.next();
         let mut l = Vec::new();
         let mut r = Vec::new();
         let mut left = true;
@@ -89,8 +89,10 @@ pub fn negate(n: &Surreal) -> Surreal {
             SurrealValue::Surreal(s) => SurrealValue::Surreal(negate(s)),
         }
     };
-    let nlhs = l.as_ref().map(|v| v.iter().map(negated).collect());
-    let nrhs = r.as_ref().map(|v| v.iter().map(negated).collect());
+    let (nlhs, nrhs) = rayon::join(
+        || l.as_ref().map(|v| v.par_iter().map(negated).collect()),
+        || r.as_ref().map(|v| v.par_iter().map(negated).collect()),
+    );
     Surreal { l: nrhs, r: nlhs }
 }
 
@@ -100,7 +102,7 @@ impl std::fmt::Display for Surreal {
         let left: String = l
             .as_ref()
             .map(|v| {
-                v.iter()
+                v.par_iter()
                     .map(value_to_string)
                     .collect::<Vec<String>>()
                     .join(", ")
@@ -109,7 +111,7 @@ impl std::fmt::Display for Surreal {
         let right: String = r
             .as_ref()
             .map(|v| {
-                v.iter()
+                v.par_iter()
                     .map(value_to_string)
                     .collect::<Vec<String>>()
                     .join(", ")
@@ -123,7 +125,7 @@ pub fn print(n: &Surreal) {
     println!("{}", n);
 }
 
-fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
+pub fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
     if to_left {
         if let Some(l) = &mut surreal.l {
             l.push(value);
@@ -139,29 +141,9 @@ fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
     }
 }
 
-pub fn star(n: i32) -> Surreal {
-    fn star_tail(n: i32, acc: Surreal) -> Surreal {
-        match n {
-            1 => acc,
-            _ => star_tail(n - 1, {
-                let mut new_acc = acc.clone();
-                append(&mut new_acc, SurrealValue::Surreal(acc.clone()), true);
-                append(&mut new_acc, SurrealValue::Surreal(acc.clone()), false);
-                new_acc
-            }),
-        }
+pub fn zero() -> Surreal {
+    Surreal {
+        l: Some(vec![].into()),
+        r: Some(vec![].into()),
     }
-    let star = Surreal {
-        l: Some(vec![SurrealValue::Integer(0)]),
-        r: Some(vec![SurrealValue::Integer(0)]),
-    };
-    if n == 1 {
-        star
-    } else {
-        star_tail(n, star)
-    }
-}
-
-pub fn astar(n1: i32, n2: i32) -> Surreal {
-    star(n1 ^ n2)
 }

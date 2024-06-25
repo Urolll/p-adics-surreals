@@ -2,7 +2,9 @@
 Computations of p-adic Numbers and Surreal Numbers in Parallel
 
 ## surreal.rs
-- [x] pub struct Surreal { pub l: Option<Vec<i32>>, pub r: Option<Vec<i32>>, }  
+- [x] pub struct Surreal { pub l: Option<Vec<SurrealValue>>, pub r: Option<Vec<SurrealValue>>, }
+
+- [x] pub enum SurrealValue { Integer(i32), Surreal(Surreal), }  
 
 - [x] fn construct(num: &str) -> Surreal  
       // takes a string of the form { L | R } and parse it to create a struct of surreal
@@ -43,7 +45,7 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
 - [ ] fn div(n1: &Surreal, n2: &Surreal) -> Surreal  
       // divides two surreal numbers together
 
-- [ ] fn zero() -> Surreal  
+- [x] fn zero() -> Surreal  
       // returns zero, which is { | }
 
 - [x] fn star(n: i32) -> Surreal  
@@ -52,7 +54,20 @@ Computations of p-adic Numbers and Surreal Numbers in Parallel
 
 - [x] fn astar(n1: i32, n2: i32) -> Surreal  
       // returns a multiple of stars from doing n1 + n2  
-      // adding stars is equivalent to xor
+      // adding stars is equivalent to xor  
+
+- [x] fn pretty_star(n: i32) -> PStar  
+      // returns a multiple of n stars readily pretty printed
+
+- [x] fn pretty_astar(n1: i32, n2: i32) -> PStar  
+      // returns a multiples of stars from doing n1 + n2 readily pretty printed
+
+- [ ] fn print_pstar(star: PStar)
+      // takes a pretty printed star and prints to the console
+
+- [ ] fn expand_pstar(star: PStar) -> Surreal
+      // converts a pretty printed star to its surreal counterpart
+      
 
 ### Example of surreal.rs Usage
 ```rust
@@ -76,9 +91,12 @@ fn main() {
       // alternative way to define surreal
       
       let also_alt_zero = zero(); // alternative function to define zero
-      let s: Surreal = star(1); // creates a surreal with { 0 | 0 } 
+      let s: Surreal = star(1); // creates a surreal with value of star: { 0 | 0 }
       let s2 = astar(2, 3); // creates a surreal with value of *2 + *3 = *1
                              // its value is { 0 | 0 }
+
+      let _p_star = pretty_star(1); // star defined using pretty form
+      let _another_p_star = pretty_astar(4, 6);
 }
 ```
 

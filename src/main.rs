@@ -1,10 +1,12 @@
+mod pstar;
 mod surreal;
+use crate::pstar::*;
 use crate::surreal::*;
 
 fn main() {
     let x = construct("{ 1, 2 | }");
     let y = construct("{ 2, 3, 4 | 9, 2 }");
-    let zero = construct("{ | }");
+    let zero = zero();
     let alt_zero = Surreal {
         l: Some(vec![]),
         r: Some(vec![]),
@@ -43,4 +45,8 @@ fn main() {
     print(&star_3);
     let star = astar(2, 3);
     print(&negate(&star));
+
+    let pstar = pretty_star(2);
+    let _pastar = pretty_astar(2, 3);
+    print_pstar(&pstar);
 }
