@@ -134,3 +134,18 @@ pub fn expand_pstar(star: PStar) -> Surreal {
     );
     Surreal { l, r }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn testing_star_astar() {
+        let star1 = star(1);
+        assert_eq!(star1, construct("{ 0 | 0 }"));
+        let star2 = star(2);
+        assert_eq!(star2, construct("{0, {0 | 0} | 0, {0 | 0}}"));
+        let astar1 = astar(2, 3);
+        assert_eq!(star1, astar1);
+    }
+}

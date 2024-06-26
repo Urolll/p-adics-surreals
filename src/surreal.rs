@@ -1,13 +1,13 @@
 use rayon::prelude::*;
 use std::str::Chars;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Surreal {
     pub l: Option<Vec<SurrealValue>>,
     pub r: Option<Vec<SurrealValue>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SurrealValue {
     Integer(i32),
     Surreal(Surreal),
@@ -142,8 +142,37 @@ pub fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
 }
 
 pub fn zero() -> Surreal {
-    Surreal {
-        l: Some(vec![].into()),
-        r: Some(vec![].into()),
+    Surreal { l: None, r: None }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn testing_construct() {
+        let result = construct("{ | }");
+        assert_eq!(result, zero());
+        let result2 = construct("{ 0 | { 1 | } }");
+        assert_eq!(
+            result2,
+            Surreal {
+                l: Some(vec![SurrealValue::Integer(0)]),
+                r: Some(vec![SurrealValue::Surreal(Surreal {
+                    l: Some(vec![SurrealValue::Integer(1)]),
+                    r: None,
+                })]),
+            }
+        );
+    }
+
+    #[test]
+    fn testing_negate() {
+        let zero = zero();
+        assert_eq!(zero, negate(&zero));
+        let one = construct("{ 0 | }");
+        assert_eq!(negate(&one), construct("{ | 0 }"));
+        let nested = construct("{ 1, 2 | { 0 | } }");
+        assert_eq!(negate(&nested), construct("{ { | 0 } | -1, -2 }"));
     }
 }
