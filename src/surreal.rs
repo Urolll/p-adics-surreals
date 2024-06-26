@@ -132,12 +132,10 @@ pub fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
         } else {
             surreal.l = Some(vec![value]);
         }
+    } else if let Some(r) = &mut surreal.r {
+        r.push(value);
     } else {
-        if let Some(r) = &mut surreal.r {
-            r.push(value);
-        } else {
-            surreal.r = Some(vec![value]);
-        }
+        surreal.r = Some(vec![value]);
     }
 }
 
@@ -164,6 +162,32 @@ mod tests {
                 })]),
             }
         );
+        let result3 = construct("{ 2, 3, 4 | 9, 2 }");
+        assert_eq!(
+            result3,
+            Surreal {
+                l: Some(vec![
+                    SurrealValue::Integer(2),
+                    SurrealValue::Integer(3),
+                    SurrealValue::Integer(4),
+                ]),
+                r: Some(vec![SurrealValue::Integer(9), SurrealValue::Integer(2),]),
+            }
+        );
+        let result4 = construct("{ | { | { | 6 } } }");
+        assert_eq!(
+            result4,
+            Surreal {
+                l: None,
+                r: Some(vec![SurrealValue::Surreal(Surreal {
+                    l: None,
+                    r: Some(vec![SurrealValue::Surreal(Surreal {
+                        l: None,
+                        r: Some(vec![SurrealValue::Integer(6),]),
+                    })]),
+                })]),
+            }
+        );
     }
 
     #[test]
@@ -174,5 +198,21 @@ mod tests {
         assert_eq!(negate(&one), construct("{ | 0 }"));
         let nested = construct("{ 1, 2 | { 0 | } }");
         assert_eq!(negate(&nested), construct("{ { | 0 } | -1, -2 }"));
+    }
+
+    #[test]
+    fn testing_append() {
+        let mut result = construct("{ | }");
+        append(&mut result, SurrealValue::Integer(0), true);
+        assert_eq!(result, construct("{ 0 | }"));
+        append(
+            &mut result,
+            SurrealValue::Surreal(Surreal {
+                l: None,
+                r: Some(vec![SurrealValue::Integer(9)]),
+            }),
+            false,
+        );
+        assert_eq!(result, construct("{ 0 | { | 9 } }"));
     }
 }
