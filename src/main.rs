@@ -50,4 +50,5 @@ fn main() {
     let _pastar = pretty_astar(2, 3);
     print_pstar(&pstar);
     print(&expand_pstar(pstar));
+    print_pstar(&pretty_star(3));
 }

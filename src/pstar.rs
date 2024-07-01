@@ -1,13 +1,13 @@
 use crate::surreal::*;
 use rayon::prelude::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PStar {
     pub l: Vec<StarValue>,
     pub r: Vec<StarValue>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StarValue {
     String(String),
     Integer(i32),
@@ -50,13 +50,13 @@ pub fn pretty_star(n: i32) -> PStar {
                     let mut new_acc = acc.clone();
                     new_acc
                         .l
-                        .push(StarValue::String("*".to_owned() + &current.to_string()));
+                        .push(StarValue::String("*".to_owned() + &(current).to_string()));
                     new_acc
                         .r
-                        .push(StarValue::String("*".to_owned() + &current.to_string()));
+                        .push(StarValue::String("*".to_owned() + &(current).to_string()));
                     new_acc
                 },
-                current - 1,
+                current + 1,
             ),
         }
     }
@@ -64,10 +64,10 @@ pub fn pretty_star(n: i32) -> PStar {
     pretty_star_tail(
         n,
         PStar {
-            l: vec![StarValue::Integer(0), StarValue::String("*".to_owned())],
-            r: vec![StarValue::Integer(0), StarValue::String("*".to_owned())],
+            l: vec![StarValue::Integer(0)], //StarValue::String("*".to_owned())],
+            r: vec![StarValue::Integer(0)], //StarValue::String("*".to_owned())],
         },
-        n,
+        1,
     )
 }
 
@@ -147,5 +147,41 @@ mod tests {
         assert_eq!(star2, construct("{0, {0 | 0} | 0, {0 | 0}}"));
         let astar1 = astar(2, 3);
         assert_eq!(star1, astar1);
+    }
+
+    #[test]
+    fn testing_pretty_star() {
+        let pstar1 = pretty_star(1);
+        let pstar2 = pretty_star(2);
+        let pstar3 = pretty_star(3);
+        assert_eq!(
+            pstar1,
+            PStar {
+                l: vec![StarValue::Integer(0)],
+                r: vec![StarValue::Integer(0)],
+            }
+        );
+        assert_eq!(
+            pstar2,
+            PStar {
+                l: vec![StarValue::Integer(0), StarValue::String("*1".to_owned())],
+                r: vec![StarValue::Integer(0), StarValue::String("*1".to_owned())],
+            }
+        );
+        assert_eq!(
+            pstar3,
+            PStar {
+                l: vec![
+                    StarValue::Integer(0),
+                    StarValue::String("*1".to_owned()),
+                    StarValue::String("*2".to_owned())
+                ],
+                r: vec![
+                    StarValue::Integer(0),
+                    StarValue::String("*1".to_owned()),
+                    StarValue::String("*2".to_owned())
+                ],
+            }
+        );
     }
 }
