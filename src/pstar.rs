@@ -26,8 +26,8 @@ pub fn star(n: i32) -> Surreal {
         }
     }
     let star = Surreal {
-        l: Some(vec![SurrealValue::Integer(0)]),
-        r: Some(vec![SurrealValue::Integer(0)]),
+        l: Some(vec![SurrealValue::Float(0.0)]),
+        r: Some(vec![SurrealValue::Float(0.0)]),
     };
     if n == 1 {
         star
@@ -107,7 +107,7 @@ fn star_to_surreal(value: &StarValue) -> SurrealValue {
                 SurrealValue::Surreal(star(n))
             }
         }
-        StarValue::Integer(i) => SurrealValue::Integer(*i),
+        StarValue::Integer(i) => SurrealValue::Float(*i as f64),
     }
 }
 

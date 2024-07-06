@@ -4,8 +4,8 @@ use crate::pstar::*;
 use crate::surreal::*;
 
 fn main() {
-    let x = construct("{ 1, 2 | }");
-    let y = construct("{ 2, 3, 4 | 9, 2 }");
+    let x = construct("{ 1.0, 2.0 | }");
+    let y = construct("{ 2.0, 3.0, 4.0 | 9.0, 2.0 }");
     let zero = zero();
     let alt_zero = Surreal {
         l: Some(vec![]),
@@ -13,9 +13,9 @@ fn main() {
     };
     let k: Surreal = Surreal {
         l: Some(vec![
-            SurrealValue::Integer(1),
-            SurrealValue::Integer(2),
-            SurrealValue::Integer(3),
+            SurrealValue::Float(1.0),
+            SurrealValue::Float(2.0),
+            SurrealValue::Float(3.0),
         ]),
         r: Some(vec![]),
     };
@@ -33,7 +33,7 @@ fn main() {
 
     print(&negate(&k));
 
-    let nested = construct("{ 1 | { 0 | { -1 | } } }");
+    let nested = construct("{ 1.0 | { 0.0 | { -1.0 | } } }");
     print(&nested);
     print(&negate(&nested));
 
@@ -51,14 +51,16 @@ fn main() {
     print_pstar(&pstar);
     print(&expand_pstar(pstar));
     print_pstar(&pretty_star(3));
-    println!("{}", add(&construct("{1 | }"), &construct("{ | -2}")));
+    println!("{}", add(&construct("{1.0 | }"), &construct("{ | -2.0}")));
     println!(
         "{}",
         pdt_add(
-            &construct("{1, 2, 3, 4, 5 | }"),
-            6,
-            &construct("{ | -2}"),
-            -3
+            &construct("{1.0, 2.0, 3.0, 4.0, 5.0 | }"),
+            6.0,
+            &construct("{ | -2.0}"),
+            -3.0
         )
     );
+    let half = construct("{0 | 1}");
+    println!("{}", pdt_add(&half, 0.5, &half, 0.5));
 }
