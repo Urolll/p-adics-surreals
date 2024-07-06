@@ -56,36 +56,31 @@ epsilon = { 0 | 1, 1/2, 1/4, 1/8, ... }
       // takes a mutable reference to a surreal number  
       // appends a surreal value to the left or right field of it
 
-- [ ] fn gt(n1: &Surreal, n2: &Surreal) -> Boolean  
+- [x] fn gt(n1: &Surreal, n2: &Surreal) -> Boolean  
       // returns True if n1 is greater than n2, False otherwise
 
-- [ ] fn lt(n1: &Surreal, n2: &Surreal) -> Boolean  
+- [x] fn lt(n1: &Surreal, n2: &Surreal) -> Boolean  
       // returns True if n1 is less than n2, False otherwise
 
-- [ ] fn ge(n1: &Surreal, n2: &Surreal) -> Boolean  
+- [x] fn ge(n1: &Surreal, n2: &Surreal) -> Boolean  
       // returns True if n1 is greater than or equal to n2, False otherwise
 
-- [ ] fn le(n1: &Surreal, n2: &Surreal) -> Boolean  
+- [x] fn le(n1: &Surreal, n2: &Surreal) -> Boolean  
       // returns True if n1 is less than or equal to n2, False otherwise
 
-- [ ] fn eq(n1: &Surreal, n2: &Surreal) -> Boolean  
-      // returns True if n1 is equal to n2, False otherwise
+- [x] fn eq(n1: &Surreal, n2: &Surreal) -> Boolean  
+      // returns True if n1 is equal to n2, False otherwise  
+      // this checks for exact equivalence, not numerical
 
-- [ ] fn compare(n1: &Surreal, n2: &Surreal, )  
+- [x] fn compare(n1: &Surreal, n2: &Surreal, )  
       // pass a comparator function in and return the value that satisfies
 
-- [ ] fn add(n1: &Surreal, n2: &Surreal) -> Surreal  
+- [x] fn add(n1: &Surreal, n2: &Surreal) -> Surreal  
       // adds two surreal numbers together
       // only defined for simple surreals
 
-- [ ] fn sub(n1: &Surreal, n2: &Surreal) -> Surreal  
-      // subtracts two surreal numbers together
-
-- [ ] fn mul(n1: &Surreal, n2: &Surreal) -> Surreal  
-      // multiplies two surreal numbers together
-
-- [ ] fn div(n1: &Surreal, n2: &Surreal) -> Surreal  
-      // divides two surreal numbers together
+- [x] fn pdt_add(n1: &Surreal, x: i32, n2: &Surreal, y: i32) -> Surreal  
+      // adds two surreal numbers together given predetermined values of n1 and n2
 
 - [x] fn zero() -> Surreal  
       // returns zero, which is { | }
@@ -161,6 +156,15 @@ fn main() {
     print(&expand_pstar(pstar));
     print_pstar(&pretty_star(3));
     println!("{}", add(&construct("{1 | }"), &construct("{ | -2}")));
+    println!(
+        "{}",
+        pdt_add(
+            &construct("{1, 2, 3, 4, 5 | }"),
+            6,
+            &construct("{ | -2}"),
+            -3
+        )
+    );
 }
 ```
 
