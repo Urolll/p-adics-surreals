@@ -1,3 +1,4 @@
+use core::panic;
 use rayon::prelude::*;
 use std::str::Chars;
 
@@ -143,6 +144,79 @@ pub fn zero() -> Surreal {
     Surreal { l: None, r: None }
 }
 
+fn convert(n: &Surreal) -> i32 {
+    if n.l.is_none() && n.r.is_none() {
+        return 0;
+    }
+    if n.l.is_none() {
+        match &n.r {
+            Some(vec) if vec.len() == 1 => match &vec[0] {
+                SurrealValue::Integer(v) => *v - 1,
+                _ => panic!("Too complicated expression to use arithmetic"),
+            },
+            _ => panic!("Too complicated expression to use arithmetic"),
+        }
+    } else if n.r.is_none() {
+        match &n.l {
+            Some(vec) if vec.len() == 1 => match &vec[0] {
+                SurrealValue::Integer(v) => *v + 1,
+                _ => panic!("Too complicated expression to use arithmetic"),
+            },
+            _ => panic!("Too complicated expression to use arithmetic"),
+        }
+    } else {
+        panic!("Surreal number has both left and right parts; cannot convert to integer");
+    }
+}
+
+fn increment(side: &Option<Vec<SurrealValue>>, x: i32) -> Vec<SurrealValue> {
+    side.as_ref().map_or_else(Vec::new, |values| {
+        values
+            .par_iter()
+            .map(|v| match v {
+                SurrealValue::Integer(i) => SurrealValue::Integer(i + x),
+                SurrealValue::Surreal(_) => panic!("undefined for nesed surreals"),
+            })
+            .collect()
+    })
+}
+
+pub fn add(n1: &Surreal, n2: &Surreal) -> Surreal {
+    // definition: x + y = {Xl + y, x + Yl | Xr + y, x + Yr}
+    let x = convert(n1);
+    let y = convert(n2);
+    let (left, right): (Vec<SurrealValue>, Vec<SurrealValue>) = rayon::join(
+        || {
+            increment(&n1.l, y)
+                .into_iter()
+                .chain(increment(&n2.l, x))
+                .collect()
+        },
+        || {
+            increment(&n1.r, y)
+                .into_iter()
+                .chain(increment(&n2.r, x))
+                .collect()
+        },
+    );
+
+    let mut leftr = Some(left.clone());
+    let mut rightr = Some(right.clone());
+
+    if left.is_empty() {
+        leftr = None;
+    }
+
+    if right.is_empty() {
+        rightr = None;
+    }
+
+    Surreal {
+        l: leftr,
+        r: rightr,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -214,5 +288,31 @@ mod tests {
             false,
         );
         assert_eq!(result, construct("{ 0 | { | 9 } }"));
+    }
+
+    #[test]
+    fn testing_conversion() {
+        assert_eq!(convert(&construct("{ | }")), 0);
+        assert_eq!(convert(&construct("{0 | }")), 1);
+        assert_eq!(convert(&construct("{4 | }")), 5);
+        assert_eq!(convert(&construct("{ | 0}")), -1);
+        assert_eq!(convert(&construct("{ | -2}")), -3);
+        assert_eq!(convert(&construct("{ | -20}")), -21);
+    }
+
+    #[test]
+    fn testing_arithmetics() {
+        let x = construct("{0 | }");
+        let y = construct("{ 1 |  }");
+        assert_eq!(add(&x, &y), construct("{2, 2 | }"));
+
+        let z = construct("{ | }");
+        assert_eq!(add(&z, &z), zero());
+        assert_eq!(add(&z, &x), x);
+        assert_eq!(add(&y, &z), y);
+        assert_eq!(
+            add(&construct("{1 | }"), &construct("{ | -2}")),
+            construct("{ -2 | 0 }")
+        );
     }
 }

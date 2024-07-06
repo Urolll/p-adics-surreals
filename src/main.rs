@@ -51,4 +51,5 @@ fn main() {
     print_pstar(&pstar);
     print(&expand_pstar(pstar));
     print_pstar(&pretty_star(3));
+    println!("{}", add(&construct("{1 | }"), &construct("{ | -2}")));
 }
