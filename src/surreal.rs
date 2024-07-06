@@ -1,8 +1,9 @@
+use core::cmp::Ordering;
 use core::panic;
 use rayon::prelude::*;
 use std::str::Chars;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct Surreal {
     pub l: Option<Vec<SurrealValue>>,
     pub r: Option<Vec<SurrealValue>>,
@@ -12,6 +13,17 @@ pub struct Surreal {
 pub enum SurrealValue {
     Integer(i32),
     Surreal(Surreal),
+}
+
+impl PartialOrd for SurrealValue {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        match (self, other) {
+            (SurrealValue::Integer(i1), SurrealValue::Integer(i2)) => i1.partial_cmp(i2),
+            (SurrealValue::Integer(_), SurrealValue::Surreal(_)) => Some(Ordering::Less),
+            (SurrealValue::Surreal(_), SurrealValue::Integer(_)) => Some(Ordering::Greater),
+            (SurrealValue::Surreal(s1), SurrealValue::Surreal(s2)) => s1.partial_cmp(s2),
+        }
+    }
 }
 
 pub fn construct(num: &str) -> Surreal {
@@ -152,20 +164,20 @@ fn convert(n: &Surreal) -> i32 {
         match &n.r {
             Some(vec) if vec.len() == 1 => match &vec[0] {
                 SurrealValue::Integer(v) => *v - 1,
-                _ => panic!("Too complicated expression to use arithmetic"),
+                _ => panic!("Too complicated"),
             },
-            _ => panic!("Too complicated expression to use arithmetic"),
+            _ => panic!("Too complicated"),
         }
     } else if n.r.is_none() {
         match &n.l {
             Some(vec) if vec.len() == 1 => match &vec[0] {
                 SurrealValue::Integer(v) => *v + 1,
-                _ => panic!("Too complicated expression to use arithmetic"),
+                _ => panic!("Too complicated"),
             },
-            _ => panic!("Too complicated expression to use arithmetic"),
+            _ => panic!("Too complicated"),
         }
     } else {
-        panic!("Surreal number has both left and right parts; cannot convert to integer");
+        panic!("Too complicated");
     }
 }
 
@@ -185,6 +197,11 @@ pub fn add(n1: &Surreal, n2: &Surreal) -> Surreal {
     // definition: x + y = {Xl + y, x + Yl | Xr + y, x + Yr}
     let x = convert(n1);
     let y = convert(n2);
+    pdt_add(n1, x, n2, y)
+}
+
+#[allow(dead_code)]
+pub fn pdt_add(n1: &Surreal, x: i32, n2: &Surreal, y: i32) -> Surreal {
     let (left, right): (Vec<SurrealValue>, Vec<SurrealValue>) = rayon::join(
         || {
             increment(&n1.l, y)
@@ -214,6 +231,77 @@ pub fn add(n1: &Surreal, n2: &Surreal) -> Surreal {
     Surreal {
         l: leftr,
         r: rightr,
+    }
+}
+
+#[allow(dead_code)]
+pub fn eq(n1: &Surreal, n2: &Surreal) -> bool {
+    n1.l.par_iter().all(|x| n2.l.par_iter().any(|y| x == y))
+        && n1.r.par_iter().all(|x| n2.r.par_iter().any(|y| x == y))
+}
+
+#[allow(dead_code)]
+pub fn le(n1: &Surreal, n2: &Surreal) -> bool {
+    let x = convert(n1);
+    let y = convert(n2);
+
+    let (check_left, check_right): (bool, bool) = rayon::join(
+        || {
+            n1.l.as_ref().map_or(true, |l_vals| {
+                l_vals.par_iter().all(|v| v <= &SurrealValue::Integer(y))
+            })
+        },
+        || {
+            n2.r.as_ref().map_or(true, |r_vals| {
+                r_vals.par_iter().all(|v| &SurrealValue::Integer(x) <= v)
+            })
+        },
+    );
+
+    check_left && check_right
+}
+
+#[allow(dead_code)]
+pub fn ge(n1: &Surreal, n2: &Surreal) -> bool {
+    le(n2, n1)
+}
+
+#[allow(dead_code)]
+pub fn lt(n1: &Surreal, n2: &Surreal) -> bool {
+    let x = convert(n1);
+    let y = convert(n2);
+
+    let (check_left, check_right): (bool, bool) = rayon::join(
+        || {
+            n1.l.as_ref().map_or(true, |l_vals| {
+                l_vals.par_iter().all(|v| v < &SurrealValue::Integer(y))
+            })
+        },
+        || {
+            n2.r.as_ref().map_or(true, |r_vals| {
+                r_vals.par_iter().all(|v| &SurrealValue::Integer(x) < v)
+            })
+        },
+    );
+
+    check_left && check_right
+}
+
+#[allow(dead_code)]
+pub fn gt(n1: &Surreal, n2: &Surreal) -> bool {
+    lt(n2, n1)
+}
+
+#[allow(dead_code)]
+pub fn compare<F>(n1: &Surreal, n2: &Surreal, comparator: F) -> Surreal
+where
+    F: Fn(&Surreal, &Surreal) -> bool + Sync,
+{
+    let result: bool = comparator(n1, n2);
+    if result {
+        n1.clone()
+    } else {
+        n2.clone()
     }
 }
 
@@ -301,6 +389,26 @@ mod tests {
     }
 
     #[test]
+    fn testing_comparisons() {
+        let n1 = construct("{0 | }");
+        let n2 = construct("{0 | }");
+        let n3 = construct("{ | 0}");
+        let n4 = construct("{1 | }");
+        let n5 = construct("{ | -2 }");
+        assert!(eq(&n1, &n1));
+        assert!(eq(&n1, &n2));
+        assert!(le(&n1, &n1));
+        assert!(le(&n1, &n1));
+        assert!(le(&n3, &n1));
+        assert!(lt(&n3, &n1));
+        assert!(lt(&n5, &n3));
+        assert!(ge(&n2, &n1));
+        assert!(ge(&n4, &n1));
+        assert!(gt(&n3, &n5));
+        assert!(gt(&n4, &n1));
+    }
+
+    #[test]
     fn testing_arithmetics() {
         let x = construct("{0 | }");
         let y = construct("{ 1 |  }");
@@ -313,6 +421,16 @@ mod tests {
         assert_eq!(
             add(&construct("{1 | }"), &construct("{ | -2}")),
             construct("{ -2 | 0 }")
+        );
+
+        assert_eq!(
+            pdt_add(
+                &construct("{1, 2, 3, 4, 5 | }"),
+                6,
+                &construct("{ | -2}"),
+                -3
+            ),
+            construct("{-2, -1, 0, 1, 2 | 4}")
         );
     }
 }

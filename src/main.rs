@@ -52,4 +52,13 @@ fn main() {
     print(&expand_pstar(pstar));
     print_pstar(&pretty_star(3));
     println!("{}", add(&construct("{1 | }"), &construct("{ | -2}")));
+    println!(
+        "{}",
+        pdt_add(
+            &construct("{1, 2, 3, 4, 5 | }"),
+            6,
+            &construct("{ | -2}"),
+            -3
+        )
+    );
 }
