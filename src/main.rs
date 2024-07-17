@@ -14,6 +14,7 @@ extern crate padic as crate_padic;
 use crate_padic::Ratio;
 use std::time::Instant;
 
+#[allow(dead_code)]
 fn create_complex_par_surreal() -> Surreal {
     let mut nested_set: Vec<Surreal> = vec![];
 
@@ -63,11 +64,11 @@ fn create_complex_par_surreal() -> Surreal {
 fn create_complex_crate_surreal() -> CrateSurreal {
     let mut nested_set: Vec<CrateSurreal> = vec![];
 
-    for i in 0..5 {
+    for _i in 0..5 {
         let mut left_set: Vec<CrateSurreal> = vec![];
         let mut right_set: Vec<CrateSurreal> = vec![];
 
-        for j in 0..5 {
+        for _j in 0..5 {
             let left_surreal = CrateSurreal::new(vec![], vec![]);
             left_set.push(left_surreal);
 
@@ -135,7 +136,8 @@ fn main() {
     let n1 = create_complex_par_surreal();
     let n2 = create_complex_par_surreal();
 
-    print(&n1);
+    //print(&n1);
+    //print(&n2);
     let _ = negate(&n1);
     let _ = negate(&n2);
 

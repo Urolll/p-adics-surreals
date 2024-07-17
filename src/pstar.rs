@@ -13,6 +13,7 @@ pub enum StarValue {
     Integer(i32),
 }
 
+#[allow(dead_code)]
 pub fn star(n: i32) -> Surreal {
     fn star_tail(n: i32, acc: Surreal) -> Surreal {
         match n {
@@ -36,10 +37,12 @@ pub fn star(n: i32) -> Surreal {
     }
 }
 
+#[allow(dead_code)]
 pub fn astar(n1: i32, n2: i32) -> Surreal {
     star(n1 ^ n2)
 }
 
+#[allow(dead_code)]
 pub fn pretty_star(n: i32) -> PStar {
     fn pretty_star_tail(n: i32, acc: PStar, current: i32) -> PStar {
         match n {
@@ -71,10 +74,12 @@ pub fn pretty_star(n: i32) -> PStar {
     )
 }
 
+#[allow(dead_code)]
 pub fn pretty_astar(n1: i32, n2: i32) -> PStar {
     pretty_star(n1 ^ n2)
 }
 
+#[allow(dead_code)]
 pub fn print_pstar(star: &PStar) {
     let l_string: String = star
         .l
@@ -97,6 +102,7 @@ pub fn print_pstar(star: &PStar) {
     println!("{{ {} | {} }}", l_string, r_string);
 }
 
+#[allow(dead_code)]
 fn star_to_surreal(value: &StarValue) -> SurrealValue {
     match value {
         StarValue::String(s) => {
@@ -111,10 +117,12 @@ fn star_to_surreal(value: &StarValue) -> SurrealValue {
     }
 }
 
+#[allow(dead_code)]
 fn map_to_surreal(values: &[StarValue]) -> Vec<SurrealValue> {
     values.par_iter().map(star_to_surreal).collect()
 }
 
+#[allow(dead_code)]
 pub fn expand_pstar(star: PStar) -> Surreal {
     let (l, r): (Option<Vec<SurrealValue>>, Option<Vec<SurrealValue>>) = rayon::join(
         || {

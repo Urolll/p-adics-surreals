@@ -38,6 +38,7 @@ impl PartialOrd for SurrealValue {
     }
 }
 
+#[allow(dead_code)]
 pub fn construct(num: &str) -> Surreal {
     fn parse_value(chars: &mut Chars) -> SurrealValue {
         let mut buffer = String::new();
@@ -99,6 +100,7 @@ pub fn construct(num: &str) -> Surreal {
     parse_surreal(&mut chars)
 }
 
+#[allow(dead_code)]
 fn value_to_string(v: &SurrealValue) -> String {
     match v {
         SurrealValue::Float(i) => i.to_string(),
@@ -106,6 +108,7 @@ fn value_to_string(v: &SurrealValue) -> String {
     }
 }
 
+#[allow(dead_code)]
 pub fn negate(n: &Surreal) -> Surreal {
     let Surreal { l, r } = n;
     let negated = |val: &SurrealValue| -> SurrealValue {
@@ -146,10 +149,12 @@ impl std::fmt::Display for Surreal {
     }
 }
 
+#[allow(dead_code)]
 pub fn print(n: &Surreal) {
     println!("{}", n);
 }
 
+#[allow(dead_code)]
 pub fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
     if to_left {
         if let Some(l) = &mut surreal.l {
@@ -164,10 +169,12 @@ pub fn append(surreal: &mut Surreal, value: SurrealValue, to_left: bool) {
     }
 }
 
+#[allow(dead_code)]
 pub fn zero() -> Surreal {
     Surreal { l: None, r: None }
 }
 
+#[allow(dead_code)]
 fn convert(n: &Surreal) -> f64 {
     if n.l.is_none() && n.r.is_none() {
         return 0.0;
@@ -193,6 +200,7 @@ fn convert(n: &Surreal) -> f64 {
     }
 }
 
+#[allow(dead_code)]
 fn increment(side: &Option<Vec<SurrealValue>>, x: f64) -> Vec<SurrealValue> {
     side.as_ref().map_or_else(Vec::new, |values| {
         values
@@ -205,6 +213,7 @@ fn increment(side: &Option<Vec<SurrealValue>>, x: f64) -> Vec<SurrealValue> {
     })
 }
 
+#[allow(dead_code)]
 pub fn add(n1: &Surreal, n2: &Surreal) -> Surreal {
     // definition: x + y = {Xl + y, x + Yl | Xr + y, x + Yr}
     let x = convert(n1);

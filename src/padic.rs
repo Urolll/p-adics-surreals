@@ -8,6 +8,7 @@ pub struct Padic {
     pub expanded: Vec<i64>,
 }
 
+#[allow(dead_code)]
 pub fn expand(f: &Frac, p: i64, precision: usize) -> Padic {
     let mut a = f.numer;
     let b = f.denom;
@@ -31,16 +32,19 @@ pub fn expand(f: &Frac, p: i64, precision: usize) -> Padic {
     Padic { v: *f, p, expanded }
 }
 
+#[allow(dead_code)]
 pub fn print_p_adic(padic: &Padic) {
     let reversed: Vec<i64> = padic.expanded.iter().cloned().rev().collect();
     let str: Vec<String> = reversed.par_iter().map(|&k| k.to_string()).collect();
     println!("...{}", str.join(""));
 }
 
+#[allow(dead_code)]
 fn converter(expanded: Vec<i64>) -> i64 {
     expanded.iter().rev().fold(0, |acc, &d| acc * 10 + d)
 }
 
+#[allow(dead_code)]
 fn back_converter(n: i64) -> Vec<i64> {
     let num = n.to_string().chars().rev().collect::<String>();
     let num_chars: Vec<char> = num.chars().collect();
@@ -51,6 +55,7 @@ fn back_converter(n: i64) -> Vec<i64> {
     expanded
 }
 
+#[allow(dead_code)]
 pub fn add_p_adic(p1: &Padic, p2: &Padic) -> Padic {
     let (i1, i2) = rayon::join(
         || converter(p1.expanded.clone()),
@@ -66,6 +71,7 @@ pub fn add_p_adic(p1: &Padic, p2: &Padic) -> Padic {
     }
 }
 
+#[allow(dead_code)]
 pub fn print_as_frac(p: &Padic) {
     println!("{}", p.v);
 }

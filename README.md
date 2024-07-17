@@ -172,11 +172,12 @@ fn main() {
 ```
 
 ## What are P-adic Numbers?
-A p-adic number is an infinitely long number going leftwards in base 'p', a prime number. 
+A p-adic number is supposedly an extension of the reals. They can be visualized as 
+an infinitely long number going leftwards in base 'p', a prime number. 
 Think of a number like ...999999, with infinitely many 9s, if we add 1 to this number, we get 
 a bunch of ...00000. So, ...999 + 1 = ...000 meaning that ...999 equals -1. 
 That was a number in base 10, which is not necessarily p-adic, because 10 is not a prime number. 
-However, we can expand this intuition to any bases we want. 
+However, we can expand this intuition to any bases we want.  
 
 ## p-adic.rs
 - [x] pub struct Padic { pub v: Frac, pub p: i64, pub expanded: Vec<i64>, }  
@@ -220,3 +221,23 @@ fn main() {
     print_as_frac(&doubled);
 }
 ```
+
+## Successful?
+It definitely performs operations on surreal and p-adic correctly, but the performance expectations 
+of making it parallel to exceed the crate implementation turns out to be naive. Making the code parallel 
+did not make it faster for 2 main reasons:  
+
+1) Choice of algorithm (certain algorithms for expanding p-adic or comparing surreals are way faster)  
+2) Simple computations (when the computations are simple enough, the overhead of parallel code becomes clear)  
+
+Original Goals in the proposal:  
+
+- [x]  implement Surreal and P-adic (with conversion and arithmetic operations)
+
+- [x]  make it correct (with a lot of test cases)
+
+- [x]  make it parallel
+
+- [ ]  make the parallel version faster than the crates (mostly failed)
+
+- [x]  extending to additional functions not found in the crate (e.g. star, construct, pdt_add, etc.)
