@@ -37,8 +37,16 @@ checksum = "3dca9240753cf90908d7e4aac30f630662b02aebaa1b58a3cadabdb23385b58b"
 name = "p-adics-surreals"
 version = "0.1.0"
 dependencies = [
+ "padic",
  "rayon",
+ "surreal",
 ]
+
+[[package]]
+name = "padic"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96d7a5276e629d197cc9b97f82ef50350a13ea260f33bdf372c874fda5cb27e0"
 
 [[package]]
 name = "rayon"
@@ -59,3 +67,9 @@ dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
 ]
+
+[[package]]
+name = "surreal"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "197aea290841fb089d6f97bb5c4f04d2bacc6672352292476223532aa202085d"

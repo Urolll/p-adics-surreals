@@ -6,4 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+padic = "0.1.6"
 rayon = "1.10"
+surreal = "0.4.1"
